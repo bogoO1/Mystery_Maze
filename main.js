@@ -57,15 +57,28 @@ createGround(loader,scene);
 createWalls(loader, scene);
 
 //gradient object
-createGradientSphere(scene, renderer, { x: -4, y: 9, z: -47 });
-createGradientSphere(scene, renderer, { x: 4, y: 9, z: -47 });
-createGradientSphere(scene, renderer, { x: 0, y: 9, z: -47 });
-createGradientSphere(scene, renderer, { x: -4, y: 5, z: -47 });
-createGradientSphere(scene, renderer, { x: 4, y: 5, z: -47 });
-createGradientSphere(scene, renderer, { x: 0, y: 5, z: -47 });
-createGradientSphere(scene, renderer, { x: -4, y: 1, z: -47 });
-createGradientSphere(scene, renderer, { x: 4, y: 1, z: -47 });
-createGradientSphere(scene, renderer, { x: 0, y: 1, z: -47 });
+
+const xPositions = [-4, 0, 4];
+const yLevels = [9, 5, 1];
+const zPositions = [-47, 47];
+
+for (let z of zPositions) {
+  for (let y of yLevels) {
+    for (let x of xPositions) {
+      createGradientSphere(scene, renderer, { x, y, z });
+    }
+  }
+}
+for (let z of zPositions) {
+  for (let y of yLevels) {
+    for (let x of xPositions) {
+      createGradientSphere(scene, renderer, { x:z, y:y, z:x });
+    }
+  }
+}
+
+
+
 //Audio_Reactive Sphere
 // Create an instance of AudioContext
 let audioContext = new (window.AudioContext || window.webkitAudioContext)();
