@@ -57,8 +57,15 @@ createGround(loader,scene);
 createWalls(loader, scene);
 
 //gradient object
-createGradientSphere(scene, renderer);
-
+createGradientSphere(scene, renderer, { x: -4, y: 9, z: -47 });
+createGradientSphere(scene, renderer, { x: 4, y: 9, z: -47 });
+createGradientSphere(scene, renderer, { x: 0, y: 9, z: -47 });
+createGradientSphere(scene, renderer, { x: -4, y: 5, z: -47 });
+createGradientSphere(scene, renderer, { x: 4, y: 5, z: -47 });
+createGradientSphere(scene, renderer, { x: 0, y: 5, z: -47 });
+createGradientSphere(scene, renderer, { x: -4, y: 1, z: -47 });
+createGradientSphere(scene, renderer, { x: 4, y: 1, z: -47 });
+createGradientSphere(scene, renderer, { x: 0, y: 1, z: -47 });
 //Audio_Reactive Sphere
 // Create an instance of AudioContext
 let audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -73,25 +80,15 @@ function startAudioContext() {
 // audio reactive sphere.
 document.addEventListener('click', startAudioContext, { once: true });
 
-const audioSphere = new AudioReactiveSphere(scene, audioContext);
-audioSphere.setPosition(43,8,-47);
-const audioSphere2 = new AudioReactiveSphere(scene, audioContext);
-audioSphere2.setPosition(47,8,-43);
+const audioSphere  = new AudioReactiveSphere(scene, audioContext, { x: 43, y: 8, z: -47 });
+const audioSphere2 = new AudioReactiveSphere(scene, audioContext, { x: 47, y: 8, z: -43 });
+const audioSphere3 = new AudioReactiveSphere(scene, audioContext, { x: -43, y: 8, z: -47 });
+const audioSphere4 = new AudioReactiveSphere(scene, audioContext, { x: -47, y: 8, z: -43 });
+const audioSphere5 = new AudioReactiveSphere(scene, audioContext, { x: 43, y: 8, z: 47 });
+const audioSphere6 = new AudioReactiveSphere(scene, audioContext, { x: 47, y: 8, z: 43 });
+const audioSphere7 = new AudioReactiveSphere(scene, audioContext, { x: -43, y: 8, z: 47 });
+const audioSphere8 = new AudioReactiveSphere(scene, audioContext, { x: -47, y: 8, z: 43 });
 
-const audioSphere3 = new AudioReactiveSphere(scene, audioContext);
-audioSphere3.setPosition(-43,8,-47);
-const audioSphere4 = new AudioReactiveSphere(scene, audioContext);
-audioSphere4.setPosition(-47,8,-43);
-
-const audioSphere5 = new AudioReactiveSphere(scene, audioContext);
-audioSphere5.setPosition(43,8, 47);
-const audioSphere6 = new AudioReactiveSphere(scene, audioContext);
-audioSphere6.setPosition(47,8, 43);
-
-const audioSphere7 = new AudioReactiveSphere(scene, audioContext);
-audioSphere7.setPosition(-43,8, 47);
-const audioSphere8 = new AudioReactiveSphere(scene, audioContext);
-audioSphere8.setPosition(-47,8, 43);
 
 
 // Movement input tracking

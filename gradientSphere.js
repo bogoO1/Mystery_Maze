@@ -6,7 +6,7 @@ async function loadShader(url) {
   return response.text();
 }
 
-export async function createGradientSphere(scene, renderer) {
+export async function createGradientSphere(scene, renderer, position = { x: 0, y: 0, z: -20 }) {
   const vertexShader = await loadShader("shaders/gradient.vert");
   const fragmentShader = await loadShader("shaders/gradient.frag");
 
@@ -22,7 +22,7 @@ export async function createGradientSphere(scene, renderer) {
 
   const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
   const gradientSphere = new THREE.Mesh(sphereGeometry, shaderMaterial);
-  gradientSphere.position.set(20, 1, -10);
+  gradientSphere.position.set(position.x, position.y, position.z);
   scene.add(gradientSphere);
 }
 

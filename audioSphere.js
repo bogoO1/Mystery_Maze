@@ -2,13 +2,13 @@
 import * as THREE from 'three';
 
 class AudioReactiveSphere {
-  constructor(scene, audioContext) {
+  constructor(scene, audioContext, position = { x: 0, y: 0, z: -20 }) {
     this.scene = scene;
     this.audioContext = audioContext;
     this.sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
     this.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     this.sphere = new THREE.Mesh(this.sphereGeometry, this.material);
-    this.sphere.position.set(0, 4, 10);
+    this.sphere.position.set(position.x, position.y, position.z);
     this.scene.add(this.sphere);
     this.setupMicrophone();
   }
