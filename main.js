@@ -7,6 +7,7 @@ import { addWalls } from "./walls/default.js";
 import AudioWall from "./mic_effect/audio_wall.js";
 import render, { setUpBloom } from "./bloom_effect/bloom_audio.js";
 
+
 import { createWalls } from "./walls.js";
 import { createGradientSphere } from './gradientSphere.js';
 import { createGround } from "./ground.js";
@@ -55,7 +56,6 @@ createGround(loader,scene);
 //wall objects
 createWalls(loader, scene);
 
-//Adel Shaders
 //gradient object
 createGradientSphere(scene, renderer);
 
@@ -69,10 +69,30 @@ function startAudioContext() {
     audioContext.resume();
   }
 }
-// Add event listener to the document
+
+// audio reactive sphere.
 document.addEventListener('click', startAudioContext, { once: true });
+
 const audioSphere = new AudioReactiveSphere(scene, audioContext);
-audioSphere.setPosition(0,4,-10);
+audioSphere.setPosition(43,8,-47);
+const audioSphere2 = new AudioReactiveSphere(scene, audioContext);
+audioSphere2.setPosition(47,8,-43);
+
+const audioSphere3 = new AudioReactiveSphere(scene, audioContext);
+audioSphere3.setPosition(-43,8,-47);
+const audioSphere4 = new AudioReactiveSphere(scene, audioContext);
+audioSphere4.setPosition(-47,8,-43);
+
+const audioSphere5 = new AudioReactiveSphere(scene, audioContext);
+audioSphere5.setPosition(43,8, 47);
+const audioSphere6 = new AudioReactiveSphere(scene, audioContext);
+audioSphere6.setPosition(47,8, 43);
+
+const audioSphere7 = new AudioReactiveSphere(scene, audioContext);
+audioSphere7.setPosition(-43,8, 47);
+const audioSphere8 = new AudioReactiveSphere(scene, audioContext);
+audioSphere8.setPosition(-47,8, 43);
+
 
 // Movement input tracking
 const keys = {};
