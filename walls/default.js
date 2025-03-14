@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { buildHallway, buildAudioHallway } from "./hallways/hallway-utils";
 
 // Add Ambient Light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
@@ -50,11 +51,20 @@ const wallRight = new THREE.Mesh(wall1Geometry, wallMaterial); //back
 wallRight.rotation.y = Math.PI / 2;
 wallRight.position.set(50, 4, 0);
 
-export function addWalls(scene) {
+export function addWalls(scene, camera) {
   scene.add(ambientLight);
   scene.add(ground);
   scene.add(wallFront);
   scene.add(wallBack);
   scene.add(wallLeft);
   scene.add(wallRight);
+  const hallway = buildAudioHallway(
+    scene,
+    camera,
+    new THREE.Vector3(-5, -1, 0),
+    new THREE.Vector3(0, 0, -10),
+    4,
+    4,
+    1
+  );
 }

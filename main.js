@@ -4,12 +4,11 @@ import { CameraCollision } from "./collision.js";
 import { WelcomeScreen } from "./loading_screen.js";
 import { PlayerController } from "./movement.js";
 import { addWalls } from "./walls/default.js";
-import AudioWall from "./mic_effect/audio_wall.js";
+import AudioWall, { updateAllAudioWalls } from "./mic_effect/audio_wall.js";
 import render, { setUpBloom } from "./bloom_effect/bloom_audio.js";
 
-
 import { createWalls } from "./walls.js";
-import { createGradientSphere } from './gradientSphere.js';
+import { createGradientSphere } from "./gradientSphere.js";
 import { createGround } from "./ground.js";
 import { addLight } from "./light.js";
 import AudioReactiveSphere from "./audioSphere.js";
@@ -31,10 +30,7 @@ const welcomeScreen = new WelcomeScreen(scene, camera);
 
 const loader = new THREE.TextureLoader();
 
-
-
-
-
+// addWalls(scene, camera);
 
 // Camera settings
 camera.position.set(0, 0, 5); // Start at y = 0
@@ -44,14 +40,13 @@ let yaw = 0,
   pitch = 0; // Camera rotation angles
 
 // Collision Detection System
-const collisionSystem = new CameraCollision(scene);
-
+// const collisionSystem = new CameraCollision(scene);
 
 //add lighting
 addLight(scene);
 
 //create ground
-createGround(loader,scene);
+createGround(loader, scene);
 
 //wall objects
 createWalls(loader, scene);
@@ -72,12 +67,10 @@ for (let z of zPositions) {
 for (let z of zPositions) {
   for (let y of yLevels) {
     for (let x of xPositions) {
-      createGradientSphere(scene, renderer, { x:z, y:y, z:x });
+      createGradientSphere(scene, renderer, { x: z, y: y, z: x });
     }
   }
 }
-
-
 
 //Audio_Reactive Sphere
 // Create an instance of AudioContext
@@ -85,24 +78,54 @@ let audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 // Function to start or resume AudioContext
 function startAudioContext() {
-  if (audioContext.state === 'suspended') {
+  if (audioContext.state === "suspended") {
     audioContext.resume();
   }
 }
 
 // audio reactive sphere.
-document.addEventListener('click', startAudioContext, { once: true });
+document.addEventListener("click", startAudioContext, { once: true });
 
-const audioSphere  = new AudioReactiveSphere(scene, audioContext, { x: 43, y: 8, z: -47 });
-const audioSphere2 = new AudioReactiveSphere(scene, audioContext, { x: 47, y: 8, z: -43 });
-const audioSphere3 = new AudioReactiveSphere(scene, audioContext, { x: -43, y: 8, z: -47 });
-const audioSphere4 = new AudioReactiveSphere(scene, audioContext, { x: -47, y: 8, z: -43 });
-const audioSphere5 = new AudioReactiveSphere(scene, audioContext, { x: 43, y: 8, z: 47 });
-const audioSphere6 = new AudioReactiveSphere(scene, audioContext, { x: 47, y: 8, z: 43 });
-const audioSphere7 = new AudioReactiveSphere(scene, audioContext, { x: -43, y: 8, z: 47 });
-const audioSphere8 = new AudioReactiveSphere(scene, audioContext, { x: -47, y: 8, z: 43 });
-
-
+const audioSphere = new AudioReactiveSphere(scene, audioContext, {
+  x: 43,
+  y: 8,
+  z: -47,
+});
+const audioSphere2 = new AudioReactiveSphere(scene, audioContext, {
+  x: 47,
+  y: 8,
+  z: -43,
+});
+const audioSphere3 = new AudioReactiveSphere(scene, audioContext, {
+  x: -43,
+  y: 8,
+  z: -47,
+});
+const audioSphere4 = new AudioReactiveSphere(scene, audioContext, {
+  x: -47,
+  y: 8,
+  z: -43,
+});
+const audioSphere5 = new AudioReactiveSphere(scene, audioContext, {
+  x: 43,
+  y: 8,
+  z: 47,
+});
+const audioSphere6 = new AudioReactiveSphere(scene, audioContext, {
+  x: 47,
+  y: 8,
+  z: 43,
+});
+const audioSphere7 = new AudioReactiveSphere(scene, audioContext, {
+  x: -43,
+  y: 8,
+  z: 47,
+});
+const audioSphere8 = new AudioReactiveSphere(scene, audioContext, {
+  x: -47,
+  y: 8,
+  z: 43,
+});
 
 // Movement input tracking
 const keys = {};
@@ -145,22 +168,18 @@ const audioWall = new AudioWall(
   camera,
   scene,
   new THREE.Vector3(0, 5, -7),
-  new THREE.Vector3(0, 5, 0),
-  25,
-  15
+  new THREE.Vector3(10, 5, -7),
+  25
 );
 
-// const audioWall2 = new AudioWall(
-//   camera,
-//   scene,
-//   new THREE.Vector3(0, 10, -40),
-//   new THREE.Vector3(0, 5, 0),
-//   25,
-//   15
-// );
+const audioWall2 = new AudioWall(
+  camera,
+  scene,
+  new THREE.Vector3(0, 10, 0),
+  new THREE.Vector3(0, 10, 7),
+  20
+);
 
-(async () => await audioWall.setMaterial())();
-// (async () => await audioWall2.setMaterial())();
 (async () => await setUpBloom(renderer, scene, camera))(); // must be called after audio wall is declared!!
 
 let time = 0;
@@ -171,7 +190,8 @@ function animate() {
   playerController.update(deltaTime);
   requestAnimationFrame(animate);
 
-  audioWall.updateAudioWall(time);
+  updateAllAudioWalls(time);
+  // audioWall.updateAudioWall(time);
   // audioWall2.updateAudioWall(time);
 
   // Render the scene

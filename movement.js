@@ -27,6 +27,8 @@ let yaw = 0,
 // Collision Detection System
 let collisionSystem;
 
+const collision_override = true;
+
 function updateCameraPosition(deltaTime, camera, keys, walkingSound) {
   const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)); // XZ only (Fixed Direction)
   const right = new THREE.Vector3(forward.z, 0, -forward.x); // Right vector perpendicular to forward and up
@@ -43,8 +45,7 @@ function updateCameraPosition(deltaTime, camera, keys, walkingSound) {
 
   // Check collision BEFORE moving
   const collision = collisionSystem.willCollide(nextPosition, camera);
-  if (!collision.colliding) {
-    console.log("here");
+  if (!collision.colliding || collision_override) {
     if (
       nextPosition.x == camera.position.x &&
       nextPosition.z == camera.position.z
@@ -66,7 +67,10 @@ function updateCameraPosition(deltaTime, camera, keys, walkingSound) {
       .addScaledVector(slideDirection, slideAmount);
 
     // Final check if sliding is possible
-    if (!collisionSystem.willCollide(slidePosition, camera).colliding) {
+    if (
+      !collisionSystem.willCollide(slidePosition, camera).colliding ||
+      collision_override
+    ) {
       camera.position.copy(slidePosition);
       walkingSound.play();
     } else if (collision.pushOutVector) {

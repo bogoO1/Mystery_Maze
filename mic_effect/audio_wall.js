@@ -9,33 +9,42 @@ import {
 } from "../bloom_effect/bloom_audio.js";
 
 const b = 5;
-
+const allAudioWalls = [];
 // add a specific bloom to the audio wall to only bloom the higher intensities.
 
-function createPlane(position, look, width, height) {
+function createPlane(position, look, diameter) {
   const planeGeometry = new THREE.PlaneGeometry(
-    width,
-    height,
-    width * 100,
-    height * 100
+    diameter,
+    diameter,
+    diameter * 100,
+    diameter * 100
   );
 
   const planeMaterial = new THREE.ShaderMaterial({});
 
   const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-
+  console.log("normal: ", new THREE.Vector3().subVectors(look, position));
   planeMesh.position.copy(position);
   planeMesh.lookAt(look);
 
   return planeMesh;
 }
 
+let analyser;
+
+document.addEventListener(
+  "click",
+  async () => {
+    analyser = await startMicAudio();
+  },
+  { once: true }
+);
+
 // user selects mic or .mp3 file.
 
 export default class AudioWall {
-  constructor(camera, scene, position, look, width, height, max_intensity = 2) {
+  constructor(camera, scene, position, look, diameter, max_intensity = 2) {
     // Start audio processing
-    this.audioAnalyser;
     setUpBloomUniforms(position, look, max_intensity);
     const wallMaterialProperties = {
       color: 0x0000ff,
@@ -55,24 +64,6 @@ export default class AudioWall {
       1.0
     );
 
-    document.addEventListener(
-      "click",
-      async () => {
-        this.analyser = await startMicAudio();
-      },
-      { once: true }
-    );
-
-    // document.addEventListener(
-    //   "click",
-    //   async () => {
-    //     setUpCustomAudio(this.onNewAudio);
-    //   },
-    //   { once: true }
-    // );
-    // this.analyser;
-    // (async () => (this.analyser = setUpCustomAudio(this.onNewAudio)))();
-
     this.uniforms = {
       audio: { value: new Array(FFT_SIZE).fill(0) },
       shape_color: { value: shape_color },
@@ -82,7 +73,7 @@ export default class AudioWall {
       //   value: new THREE.Vector3().subVectors(look, position).normalize(),
       // },
       maxDist: {
-        value: Math.min(width, height) / 2, //Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2)),
+        value: diameter / 2, //Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2)),
       },
       max_depth_intensity: { value: max_intensity },
     };
@@ -90,9 +81,7 @@ export default class AudioWall {
     this.vertexShader = "";
     this.fragmentShader = "";
 
-    console.log(this.vertexShader);
-
-    this.wall = createPlane(position, look, width, height);
+    this.wall = createPlane(position, look, diameter);
     this.wall.material = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
     });
@@ -101,6 +90,8 @@ export default class AudioWall {
     this.wall.layers.enable(BLOOM_SCENE);
 
     this.addAudioWall(scene);
+    allAudioWalls.push(this);
+    (async () => await this.setMaterial())();
   }
 
   onNewAudio(stream, audioContext) {
@@ -128,7 +119,8 @@ export default class AudioWall {
       { textToReplace: "FFT_SIZE_REPLACE", replaceValue: FFT_SIZE.toString() },
     ]);
 
-    console.log(this.vertexShader);
+    console.log("Vertex Shader Loaded:", this.vertexShader);
+    console.log("Fragment Shader Loaded:", this.fragmentShader);
 
     this.material = new THREE.ShaderMaterial({
       vertexShader: this.vertexShader,
@@ -144,22 +136,16 @@ export default class AudioWall {
   }
 
   updateAudioWall(time) {
-    // Get frequency data
-    const frequencyData = getFrequencyDataMic(this.analyser);
-    // for (let i = 0; i < frequencyData.length; i++) {
-    //   frequencyData[i] = i / 2;
-    // }
-    const previousAudioData = this.uniforms.audio.value;
+    const frequencyData = getFrequencyDataMic(analyser);
+    console.log("Frequency Data:", frequencyData); // Debugging line
 
+    const previousAudioData = this.uniforms.audio.value;
     let newFrequencyData = [];
 
     for (let i = 0; i < frequencyData.length; i++) {
-      // newFrequencyData[i] = this.attenuationFunction(
-      //   Number(frequencyData[i]) / 255.0
-      // );
       newFrequencyData[i] = frequencyData[i] / 255.0;
     }
-    // console.log(newFrequencyData);
+
     for (let i = 0; i < newFrequencyData.length; i++) {
       this.uniforms.audio.value[i] =
         previousAudioData[i] +
@@ -187,4 +173,31 @@ export default class AudioWall {
       });
     }
   }
+}
+
+export function updateAllAudioWalls(time) {
+  if (allAudioWalls.length === 0) return;
+  // Get frequency data
+  const frequencyData = getFrequencyDataMic(analyser);
+  // for (let i = 0; i < frequencyData.length; i++) {
+  //   frequencyData[i] = i / 2;
+  // }
+  const previousAudioData = allAudioWalls[0].uniforms.audio.value;
+
+  let newFrequencyData = [];
+
+  for (let i = 0; i < frequencyData.length; i++) {
+    // newFrequencyData[i] = audioWall.attenuationFunction(
+    //   Number(frequencyData[i]) / 255.0
+    // );
+    newFrequencyData[i] = frequencyData[i] / 255.0;
+    newFrequencyData[i] =
+      previousAudioData[i] + (newFrequencyData[i] - previousAudioData[i]) * 0.5;
+  }
+  allAudioWalls.forEach((audioWall) => {
+    // console.log(newFrequencyData);
+    for (let i = 0; i < newFrequencyData.length; i++) {
+      audioWall.uniforms.audio.value[i] = newFrequencyData[i]; // Interpolating with a factor of 0.1
+    }
+  });
 }
